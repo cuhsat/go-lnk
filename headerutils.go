@@ -66,7 +66,7 @@ func HotKey(hotkey uint16) string {
 
 	switch {
 	case 0x30 <= lb && lb <= 0x5A:
-		sb.WriteString(string(lb))
+		sb.WriteString(string(rune(lb)))
 	case 0x70 <= lb && lb <= 0x87:
 		sb.WriteString("F" + strconv.Itoa(int(lb-0x70+1)))
 	case lb == 0x90:
@@ -83,10 +83,19 @@ func HotKey(hotkey uint16) string {
 
 // toTime converts an 8-byte Windows Filetime to time.Time.
 func toTime(t [8]byte) time.Time {
+	// unix epoch in 100ns intervals
+	const epoch int64 = 116444736000000000
+
 	// Taken from https://golang.org/src/syscall/types_windows.go#L352, which is only available on Windows
 	nsec := int64(binary.LittleEndian.Uint32(t[4:]))<<32 + int64(binary.LittleEndian.Uint32(t[:4]))
+
+	// if the time is before unix epoch, return a zero time
+	if nsec < epoch {
+		return time.Time{}
+	}
+
 	// change starting time to the Epoch (00:00:00 UTC, January 1, 1970)
-	nsec -= 116444736000000000
+	nsec -= epoch
 	// convert into nanoseconds
 	nsec *= 100
 	return time.Unix(0, nsec)
