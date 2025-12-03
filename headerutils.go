@@ -96,9 +96,11 @@ func toTime(t [8]byte) time.Time {
 
 	// change starting time to the Epoch (00:00:00 UTC, January 1, 1970)
 	nsec -= epoch
-	// convert into nanoseconds
-	nsec *= 100
-	return time.Unix(0, nsec)
+
+	// convert to seconds and nanoseconds individually to avoid any possible overflow risk.
+	seconds := nsec / 10000000       // nsec is 100ns intervals, so divide by 10000000 to get seconds
+	nanos := (nsec % 10000000) * 100 // take the remainder and multiply by 100 to get nanoseconds
+	return time.Unix(seconds, nanos)
 }
 
 // formatTime converts a 8-byte Windows Filetime to time.Time and then formats
