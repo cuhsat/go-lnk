@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/parsiya/golnk"
+	"github.com/cuhsat/golnk"
 )
 
 func main() {
 
-	Lnk, err := lnk.File("vbox-svr-win10.lnk")
+	Lnk, err := lnk.Open("vbox-svr-win10.lnk")
 	if err != nil {
 		panic(err)
 	}

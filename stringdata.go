@@ -2,9 +2,6 @@ package lnk
 
 import (
 	"io"
-	"strings"
-
-	"github.com/olekukonko/tablewriter"
 )
 
 // Optional StringData - Section 2.4.
@@ -13,9 +10,9 @@ import (
 // Fields are mostly optional and present if certain flags are set.
 type StringDataSection struct {
 
-	// On disk, all these fields have a uint16 size, followed by a string.
+	// On disk, all these fields have an uint16 size, followed by a string.
 	// The string is not null-terminated.
-	// The strings are unicode if IsUnicode is set in header.
+	// The strings are Unicode if IsUnicode is set in header.
 
 	// NameString specifies a description of the shortcut that is displayed to
 	// end users to identify the purpose of the shell link.
@@ -45,7 +42,7 @@ type StringDataSection struct {
 // flags is the ShellLinkHeader.LinkFlags.
 func StringData(r io.Reader, linkFlags FlagMap) (st StringDataSection, err error) {
 
-	// Read unicode strings if is unicode flag is set.
+	// Read Unicode strings if is Unicode flag is set.
 	isUnicode := linkFlags["IsUnicode"]
 
 	// Read NameString if HasName flag is set.
@@ -87,44 +84,4 @@ func StringData(r io.Reader, linkFlags FlagMap) (st StringDataSection, err error
 		}
 	}
 	return st, err
-}
-
-// String prints StringDataSection in a table.
-func (st StringDataSection) String() string {
-	var sb strings.Builder
-
-	table := tablewriter.NewWriter(&sb)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetRowLine(true)
-
-	table.SetHeader([]string{"StringData", "Value"})
-
-	if st.NameString != "" {
-		table.Append([]string{"NameString", st.NameString})
-	}
-
-	if st.RelativePath != "" {
-		table.Append([]string{"RelativePath", st.RelativePath})
-	}
-
-	if st.WorkingDir != "" {
-		table.Append([]string{"WorkingDir", st.WorkingDir})
-	}
-
-	if st.CommandLineArguments != "" {
-		table.Append([]string{"CommandLineArguments", st.CommandLineArguments})
-	}
-
-	if st.IconLocation != "" {
-		table.Append([]string{"IconLocation", st.IconLocation})
-	}
-
-	table.Render()
-	return sb.String()
-}
-
-// toASCII converts English Unicode text to ASCII. First we detect if input is
-// English text by checking if half of the string is 0x00, if so, remove those bytes.
-func toASCII(str string) string {
-	return strings.Replace(str, " ", "", -1)
 }

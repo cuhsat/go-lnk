@@ -58,7 +58,7 @@ func HotKey(hotkey uint16) string {
 		sb.WriteString("ALT")
 	default:
 		// 0x00 is technically "no key assigned", but any value other than these
-		// is the same.
+		// are the same.
 		return "No Key Assigned"
 	}
 
@@ -75,7 +75,7 @@ func HotKey(hotkey uint16) string {
 		sb.WriteString("SCROLL LOCK")
 	default:
 		// 0x00 is technically "no key assigned", but any value other than these
-		// is the same.
+		// are the same.
 		return "No Key Assigned"
 	}
 	return sb.String()
@@ -103,26 +103,20 @@ func toTime(t [8]byte) time.Time {
 	return time.Unix(seconds, nanos)
 }
 
-// formatTime converts a 8-byte Windows Filetime to time.Time and then formats
-// it to string.
-func formatTime(t [8]byte) string {
-	return toTime(t).Format("2006-01-02 15:04:05.999999 -07:00")
-}
-
 // Flag utilities.
 
 /*
-	matchFlag does the following:
-	Given a uint32 flag read in littleEndian from disk and a []string,
-	match the flag bits and return a map[string]bool (FlagMap) that has the
-	// matched flags as keys.
-	Flag bits must be reversed because bits are matched to the flags from 0
-	onwards but the bit string is the other way around.
+matchFlag does the following:
+Given an uint32 flag read in littleEndian from disk and a []string,
+match the flag bits and return a map[string]bool (FlagMap) that has the
+// matched flags as keys.
+Flag bits must be reversed because bits are matched to the flags from 0
+onwards but the bit string is the other way around.
 */
 func matchFlag(flag uint32, flagText []string) FlagMap {
 	// Convert to bits and then reverse.
 	flagBits := reverse(fmt.Sprintf("%b", flag))
-	mp := make(FlagMap, 0)
+	mp := make(FlagMap)
 	// If we have more bits than flags (something has gone wrong or the file is corrupted),
 	// then reduce the flagbits.
 

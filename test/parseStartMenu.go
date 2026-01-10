@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/parsiya/golnk"
+	"github.com/cuhsat/golnk"
 )
 
 // Sample program to parse all lnk files in the "All Users" start menu at
@@ -14,12 +14,12 @@ import (
 func main() {
 	startMenu := "C:/ProgramData/Microsoft/Windows/Start Menu/Programs"
 
-	basePaths := []string{}
+	var basePaths []string
 
 	err := filepath.Walk(startMenu, func(path string, info os.FileInfo, walkErr error) error {
 		// Only look for lnk files.
 		if filepath.Ext(info.Name()) == ".lnk" {
-			f, lnkErr := lnk.File(path)
+			f, lnkErr := lnk.Open(path)
 			// Print errors and move on to the next file.
 			if lnkErr != nil {
 				fmt.Println(lnkErr)

@@ -4,25 +4,27 @@ import (
 	"fmt"
 	"os"
 
-	lnk "github.com/parsiya/golnk"
+	lnk "github.com/cuhsat/golnk"
 )
 
 func main() {
 
-	fi, err := os.Open("remote.directory.xp.test")
+	f, err := os.Open("remote.directory.xp.test")
 	if err != nil {
 		panic(err)
 	}
-	defer fi.Close()
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
 
 	// // lnk files are small-ish, no reason not to read everything at once.
-	// // lnkBytes, err := ioutil.ReadAll(fi)
+	// // lnkBytes, err := ioutil.ReadAll(f)
 	// // if err != nil {
 	// // 	panic(err)
 	// // }
 	// // fmt.Printf("Read %d bytes.\n", len(lnkBytes))
 
-	// h, err := lnk.Header(fi)
+	// h, err := lnk.Header(f)
 	// if err != nil {
 	// 	panic(err)
 	// }
@@ -33,35 +35,40 @@ func main() {
 
 	// fmt.Println(h.LinkFlags)
 
-	// lt, err := lnk.LinkTarget(fi)
+	// lt, err := lnk.LinkTarget(f)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	// _ = lt
 	// fmt.Println(lnk.StructToJSON(lt, true))
 
-	// li, err := lnk.LinkInfo(fi)
+	// li, err := lnk.LinkInfo(f)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	// _ = li
 	// fmt.Println(lnk.StructToJSON(li, true))
 
-	// st, err := lnk.StringData(fi, h.LinkFlags)
+	// st, err := lnk.StringData(f, h.LinkFlags)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	// _ = st
 	// fmt.Println(lnk.StructToJSON(st, true))
 
-	// edb, err := lnk.DataBlock(fi)
+	// edb, err := lnk.DataBlock(f)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	// _ = edb
 	// // fmt.Println(lnk.StructToJSON(edb, true))
 
-	ln, err := lnk.Read(fi)
+	fi, err := f.Stat()
+	if err != nil {
+		panic(err)
+	}
+
+	ln, err := lnk.Read(f, uint64(fi.Size()))
 	if err != nil {
 		panic(err)
 	}

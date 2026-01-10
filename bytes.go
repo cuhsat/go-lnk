@@ -8,7 +8,7 @@ import (
 	"unicode/utf8"
 )
 
-// byteMaskuint16 returns one of the two bytes from a uint16.
+// byteMaskuint16 returns one of the two bytes from an uint16.
 func byteMaskuint16(b uint16, n int) uint16 {
 	// Maybe we should not panic, hmm.
 	if n < 0 || n > 2 {
@@ -18,7 +18,7 @@ func byteMaskuint16(b uint16, n int) uint16 {
 	return (b & mask) >> uint16(n*8)
 }
 
-// bitMaskuint32 returns one of the 32-bits from a uint32.
+// bitMaskuint32 returns one of the 32-bits from an uint32.
 // Returns true for 1 and false for 0.
 func bitMaskuint32(b uint32, n int) bool {
 	if n < 0 || n > 31 {
@@ -27,30 +27,16 @@ func bitMaskuint32(b uint32, n int) bool {
 	return ((b >> uint(n)) & 1) == 1
 }
 
-// ReadBytes reads n bytes from the slice starting from offset and
-// returns a []byte and the number of bytes read. If offset is out of bounds
-// it returns an empty []byte and 0 bytes read.
-// TODO: Write tests for this.
-func ReadBytes(b []byte, offset, num int) (out []byte, n int) {
-	if offset >= len(b) {
-		return out, 0
-	}
-	if offset+num >= len(b) {
-		return b[offset:], len(b[offset:])
-	}
-	return b[offset : offset+num], num
-}
-
 /*
-	readSection reads a size from the start of the io.Reader. The size length is
-	decided by the parameter sSize.
-	sSize == 2 - read uint16
-	sSize == 4 - read uint32
-	sSize == 8 - read uint64 - Not needed for now.
-	Then read (size-sSize) bytes, populate the start with the original bytes
-	and add the rest. Finally return the []byte and a new io.Reader to it.
-	The size bytes are added to the start of the []byte to keep the section
-	[]byte intact for later offset use.
+readSection reads a size from the start of the io.Reader. The size length is
+decided by the parameter sSize.
+sSize == 2 - read uint16
+sSize == 4 - read uint32
+sSize == 8 - read uint64 - Not needed for now.
+Then read (size-sSize) bytes, populate the start with the original bytes
+and add the rest. Finally return the []byte and a new io.Reader to it.
+The size bytes are added to the start of the []byte to keep the section
+[]byte intact for later offset use.
 */
 func readSection(r io.Reader, sSize int, maxSize uint64) (data []byte, nr io.Reader, size int, err error) {
 	// We are not going to lose data by copying a smaller var into a larger one.
@@ -124,7 +110,7 @@ func readString(data []byte) string {
 // first 0x0000.
 func readUnicodeString(data []byte) string {
 
-	// Read two bytes at a time and convert to rune, stop if both are 0x0000 or
+	// Read two bytes at a time and convert to rune, stop if both are 0x0000, or
 	// we have reached the end of the input.
 	var runes []rune
 	for bitIndex := 0; bitIndex < len(data)/2; bitIndex++ {
@@ -162,7 +148,7 @@ func readStringData(r io.Reader, isUnicode bool) (str string, err error) {
 	if err != nil {
 		return str, fmt.Errorf("golnk.readStringData: read bytes - %s", err.Error())
 	}
-	// If unicode, read every 2 byte and get a rune.
+	// If Unicode, read every 2 byte and get a rune.
 	if isUnicode {
 		var runes []rune
 		for bitIndex := 0; bitIndex < int(size)/2; bitIndex++ {
@@ -174,7 +160,7 @@ func readStringData(r io.Reader, isUnicode bool) (str string, err error) {
 	return string(b), nil
 }
 
-// uint16Little reads a uint16 from []byte and returns the result in Little-Endian.
+// uint16Little reads an uint16 from []byte and returns the result in Little-Endian.
 func uint16Little(b []byte) uint16 {
 	if len(b) < 2 {
 		panic(fmt.Sprintf("input smaller than two bytes - got %d", len(b)))
@@ -182,7 +168,7 @@ func uint16Little(b []byte) uint16 {
 	return binary.LittleEndian.Uint16(b)
 }
 
-// uint32Little reads a uint32 from []byte and returns the result in Little-Endian.
+// uint32Little reads an uint32 from []byte and returns the result in Little-Endian.
 func uint32Little(b []byte) uint32 {
 	if len(b) < 4 {
 		panic(fmt.Sprintf("input smaller than four bytes - got %d", len(b)))
@@ -190,7 +176,7 @@ func uint32Little(b []byte) uint32 {
 	return binary.LittleEndian.Uint32(b)
 }
 
-// uint64Little reads a uint64 from []byte and returns the result in Little-Endian.
+// uint64Little reads an uint64 from []byte and returns the result in Little-Endian.
 func uint64Little(b []byte) uint64 {
 	if len(b) < 8 {
 		panic(fmt.Sprintf("input smaller than eight bytes - got %d", len(b)))
@@ -198,22 +184,12 @@ func uint64Little(b []byte) uint64 {
 	return binary.LittleEndian.Uint64(b)
 }
 
-// uint16Str converts a uint16 to string using fmt.Sprint.
-func uint16Str(u uint16) string {
-	return fmt.Sprint(u)
-}
-
-// int16Str converts an int16 to string using fmt.Sprint.
-func int16Str(u int16) string {
-	return fmt.Sprint(u)
-}
-
-// uint32Str converts a uint32 to string using fmt.Sprint.
+// uint32Str converts an uint32 to string using fmt.Sprint.
 func uint32Str(u uint32) string {
 	return fmt.Sprint(u)
 }
 
-// uint32StrHex converts a uint32 to a hex encoded string using fmt.Sprintf.
+// uint32StrHex converts an uint32 to a hex encoded string using fmt.Sprintf.
 func uint32StrHex(u uint32) string {
 	str := fmt.Sprintf("%x", u)
 	// Add a 0 to the start of odd-length string. This converts "0x1AB" to "0x01AB"
@@ -227,11 +203,6 @@ func uint32StrHex(u uint32) string {
 // of uint32.
 func uint32TableStr(u uint32) string {
 	return fmt.Sprintf("%s - %s", uint32Str(u), uint32StrHex(u))
-}
-
-// int32Str converts an int32 to string using fmt.Sprint.
-func int32Str(u int32) string {
-	return fmt.Sprint(u)
 }
 
 // uint16Byte converts a uint16 to a []byte.

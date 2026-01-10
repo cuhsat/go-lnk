@@ -17,14 +17,14 @@ type ExtraDataSection struct {
 }
 
 /*
-	ExtraDataBlock represents one of the optional data blocks at the end of the
-	lnk file.
-	Each data block starts with a uint32 size and a uint32 signature.
-	Detection is as follows:
-	1. Read the uint32 size. If size < 0x04, it's the terminal block.
-	2. Read the datablock (size-4) more bytes from the io.Reader.
-	3. Read the uint32 signature. It will designate the datablock.
-	4. Parse the data based on the signature.
+ExtraDataBlock represents one of the optional data blocks at the end of the
+lnk file.
+Each data block starts with an uint32 size and an uint32 signature.
+Detection is as follows:
+1. Read the uint32 size. If size < 0x04, it's the terminal block.
+2. Read the datablock (size-4) more bytes from the io.Reader.
+3. Read the uint32 signature. It will designate the datablock.
+4. Parse the data based on the signature.
 */
 type ExtraDataBlock struct {
 	Size      uint32

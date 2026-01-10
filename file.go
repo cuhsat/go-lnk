@@ -6,8 +6,8 @@ import (
 	"os"
 )
 
-// LnkFile represents one lnk file.
-type LnkFile struct {
+// File represents one lnk file.
+type File struct {
 	Header     ShellLinkHeaderSection  // File header.
 	IDList     LinkTargetIDListSection // LinkTargetIDList.
 	LinkInfo   LinkInfoSection         // LinkInfo.
@@ -15,8 +15,8 @@ type LnkFile struct {
 	DataBlocks ExtraDataSection        // ExtraData blocks.
 }
 
-// Read parses an io.Reader pointing to the contents of an lnk file.
-func Read(r io.Reader, maxSize uint64) (f LnkFile, err error) {
+// Read parses an io.Reader pointing to the contents of a lnk file.
+func Read(r io.Reader, maxSize uint64) (f File, err error) {
 
 	f.Header, err = Header(r, maxSize)
 	if err != nil {
@@ -53,13 +53,15 @@ func Read(r io.Reader, maxSize uint64) (f LnkFile, err error) {
 	return f, err
 }
 
-// File parses an lnk File.
-func File(filename string) (f LnkFile, err error) {
+// Open parses a lnk File.
+func Open(filename string) (f File, err error) {
 	fi, err := os.Open(filename)
 	if err != nil {
 		return f, fmt.Errorf("golnk.File: open file - %s", err.Error())
 	}
-	defer fi.Close()
+	defer func(fi *os.File) {
+		_ = fi.Close()
+	}(fi)
 
 	// To try and detect malformed lnk files, we'll make sure no section is bigger than the actual file size as that
 	// shouldn't ever happen

@@ -4,9 +4,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"strings"
-
-	"github.com/olekukonko/tablewriter"
 )
 
 // CommonNetworkRelativeLink (section 2.3.2)
@@ -30,7 +27,7 @@ type CommonNetworkRelativeLink struct {
 	// Type of NetworkProvider. See networkProviderType for table.
 	// If ValidNetType is not set, ignore this.
 	// NetworkProviderType uint32
-	NetworkProviderType string // A uint32 in file, maps to networkProviderType.
+	NetworkProviderType string // An uint32 in file, maps to networkProviderType.
 
 	// Optional offset of NetNameUnicode. Must not exist if NetNameOffset > 0x14.
 	NetNameOffsetUnicode uint32
@@ -70,7 +67,7 @@ func networkProviderType(index uint32) string {
 		0x001B0000: "WNNC_NET_DOCUSPACE",
 		0x001C0000: "WNNC_NET_MANGOSOFT",
 		0x001D0000: "WNNC_NET_SERNET",
-		0X001E0000: "WNNC_NET_RIVERFRONT1",
+		0x001E0000: "WNNC_NET_RIVERFRONT1",
 		0x001F0000: "WNNC_NET_RIVERFRONT2",
 		0x00200000: "WNNC_NET_DECORB",
 		0x00210000: "WNNC_NET_PROTSTOR",
@@ -97,7 +94,7 @@ func networkProviderType(index uint32) string {
 		0x00370000: "WNNC_NET_SRT",
 		0x00380000: "WNNC_NET_QUINCY",
 		0x00390000: "WNNC_NET_OPENAFS",
-		0X003A0000: "WNNC_NET_AVID1",
+		0x003A0000: "WNNC_NET_AVID1",
 		0x003B0000: "WNNC_NET_DFS",
 		0x003C0000: "WNNC_NET_KWNP",
 		0x003D0000: "WNNC_NET_ZENWORKS",
@@ -199,49 +196,4 @@ func CommonNetwork(r io.Reader, maxSize uint64) (c CommonNetworkRelativeLink, er
 		// fmt.Println("NetName", c.NetName)
 	}
 	return c, err
-}
-
-// String prints CommonNetworkRelativeLink in a table.
-func (c CommonNetworkRelativeLink) String() string {
-	var sb, flags strings.Builder
-
-	// Append all flags.
-	for _, fl := range c.CommonNetworkRelativeLinkFlagsStr {
-		flags.WriteString(fl)
-		flags.WriteString("\n")
-	}
-
-	table := tablewriter.NewWriter(&sb)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetRowLine(true)
-
-	table.SetHeader([]string{"CommonNetworkRelativeLink", "Value"})
-
-	table.Append([]string{"Size", uint32TableStr(c.Size)})
-	table.Append([]string{"Flags", flags.String()})
-	table.Append([]string{"NetworkProviderType", c.NetworkProviderType})
-
-	// Only add rows that exist (their offset is not zero).
-	if c.NetNameOffset != 0 {
-		table.Append([]string{"NetNameOffset", uint32TableStr(c.NetNameOffset)})
-		table.Append([]string{"NetName", c.NetName})
-	}
-
-	if c.DeviceNameOffset != 0 {
-		table.Append([]string{"DeviceNameOffset", uint32TableStr(c.DeviceNameOffset)})
-		table.Append([]string{"DeviceName", c.DeviceName})
-	}
-
-	if c.NetNameOffsetUnicode != 0 {
-		table.Append([]string{"NetNameOffsetUnicode", uint32TableStr(c.NetNameOffsetUnicode)})
-		table.Append([]string{"NetNameUnicode", c.NetNameUnicode})
-	}
-
-	if c.DeviceNameOffsetUnicode != 0 {
-		table.Append([]string{"DeviceNameOffsetUnicode", uint32TableStr(c.DeviceNameOffsetUnicode)})
-		table.Append([]string{"DeviceNameUnicode", c.DeviceNameUnicode})
-	}
-
-	table.Render()
-	return sb.String()
 }

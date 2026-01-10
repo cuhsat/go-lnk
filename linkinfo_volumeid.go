@@ -5,9 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"strings"
-
-	"github.com/olekukonko/tablewriter"
 )
 
 // VolID is VolumeID (section 2.3.1. of [SHLLINK]).
@@ -17,12 +14,12 @@ type VolID struct {
 	Size uint32
 
 	// Type of drive that target was stored on.
-	DriveType string // Originally a uint32 that is the index to the driveType []string.
+	DriveType string // Originally an uint32 that is the index to the driveType []string.
 
 	// Serial number of the volume. TODO: Store as hex string?
-	DriveSerialNumber string // Originally a uint32, converted to hex string.
+	DriveSerialNumber string // Originally an uint32, converted to hex string.
 
-	// Offset to the a null-terminated string that contains the volume label of
+	// Offset to the null-terminated string that contains the volume label of
 	// the drive that the link target is stored on.
 	// If == 0x14, it must be ignored and VolumeLabelOffsetUnicode must be used.
 	VolumeLabelOffset uint32
@@ -65,7 +62,7 @@ func VolumeID(r io.Reader, maxSize uint64) (v VolID, err error) {
 	}
 	// Check if it's a valid DriveType.
 	if dt >= uint32(len(driveType)) {
-		// This is not in the specification but it's better than just returning
+		// This is not in the specification, but it's better than just returning
 		// an error and cancelling the parse.
 		v.DriveType = "DRIVE_INVALID"
 	} else {
@@ -73,7 +70,7 @@ func VolumeID(r io.Reader, maxSize uint64) (v VolID, err error) {
 	}
 	// fmt.Println("VolumeID.DriveType:", v.DriveType)
 
-	// Read DriveSerialNumber which is a uint32.
+	// Read DriveSerialNumber which is an uint32.
 	var sr [4]byte
 	err = binary.Read(sectionReader, binary.LittleEndian, &sr)
 	if err != nil {
@@ -110,39 +107,10 @@ func VolumeID(r io.Reader, maxSize uint64) (v VolID, err error) {
 	err = binary.Read(sectionReader, binary.LittleEndian, &v.VolumeLabelOffsetUnicode)
 	// fmt.Println("v.VolumeLabelOffsetUnicode", v.VolumeLabelOffsetUnicode)
 
-	// Read a unicode string from that offset.
+	// Read a Unicode string from that offset.
 	unicodeStr := readUnicodeString(sectionData[v.VolumeLabelOffsetUnicode:])
 	v.VolumeLabel = unicodeStr
 	// fmt.Println("VolumeLabelUnicode", v.VolumeLabel)
 
 	return v, err
-}
-
-// String prints VolumeID in a table.
-func (v VolID) String() string {
-
-	var sb strings.Builder
-
-	table := tablewriter.NewWriter(&sb)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetRowLine(true)
-
-	table.SetHeader([]string{"VolumeID", "Value"})
-
-	table.Append([]string{"Size", uint32TableStr(v.Size)})
-	table.Append([]string{"DriveType", v.DriveType})
-	table.Append([]string{"DriveSerialNumber", v.DriveSerialNumber})
-
-	if v.VolumeLabelOffset != 0 {
-		table.Append([]string{"VolumeLabelOffset", uint32TableStr(v.VolumeLabelOffset)})
-		table.Append([]string{"VolumeLabel", v.VolumeLabel})
-	}
-
-	if v.VolumeLabelOffsetUnicode != 0 {
-		table.Append([]string{"VolumeLabelOffsetUnicode", uint32TableStr(v.VolumeLabelOffsetUnicode)})
-		table.Append([]string{"VolumeLabel", v.VolumeLabel})
-	}
-
-	table.Render()
-	return sb.String()
 }

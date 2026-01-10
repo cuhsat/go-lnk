@@ -5,10 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"strings"
 	"time"
-
-	"github.com/olekukonko/tablewriter"
 )
 
 const (
@@ -28,7 +25,7 @@ type ShellLinkHeaderSection struct {
 	Magic          uint32    // Header size: should be 0x4c.
 	LinkCLSID      [16]byte  // A class identifier, should be 00021401-0000-0000-C000-000000000046.
 	LinkFlags      FlagMap   // Information about the file and optional sections in the file.
-	FileAttributes FlagMap   // File attributes about link target, originally a uint32.
+	FileAttributes FlagMap   // File attributes about link target, originally an uint32.
 	CreationTime   time.Time // Creation time of link target in UTC. 16 bytes in file.
 	AccessTime     time.Time // Access time of link target. Could be zero. 16 bytes in file.
 	WriteTime      time.Time // Write time  of link target. Could be zero. 16 bytes in file.
@@ -42,7 +39,7 @@ type ShellLinkHeaderSection struct {
 	Raw            []byte    // Section's raw bytes.
 }
 
-// linkFlags defines what shell link structures are in the file.
+// linkFlags defines what link structures are in the file.
 var linkFlags = []string{
 	"HasLinkTargetIDList",         // bit00 - ShellLinkHeader is followed by a LinkTargetIDList structure.
 	"HasLinkInfo",                 // bit01 - LinkInfo in file.
@@ -51,7 +48,7 @@ var linkFlags = []string{
 	"HasWorkingDir",               // bit04 - WORKING_DIR in file.
 	"HasArguments",                // bit05 - COMMAND_LINE_ARGUMENTS
 	"HasIconLocation",             // bit06 - ICON_LOCATION
-	"IsUnicode",                   // bit07 - Strings are in unicode
+	"IsUnicode",                   // bit07 - Strings are in Unicode
 	"ForceNoLinkInfo",             // bit08 - LinkInfo is ignored
 	"HasExpString",                // bit09 - The shell link is saved with an EnvironmentVariableDataBlock
 	"RunInSeparateProcess",        // bit10 - Target runs in a 16-bit virtual machine
@@ -126,7 +123,7 @@ func Header(r io.Reader, maxSize uint64) (head ShellLinkHeaderSection, err error
 
 	// Parse LinkFlags.
 	// Convert the next uint32 to bits, go over the bits and add the flags.
-	// We will lose preceding zeros by using uint32 but we do not care about them.
+	// We will lose preceding zeros by using uint32, but we do not care about them.
 	var lf uint32
 	err = binary.Read(sectionReader, binary.LittleEndian, &lf)
 	if err != nil {
@@ -192,48 +189,11 @@ func Header(r io.Reader, maxSize uint64) (head ShellLinkHeaderSection, err error
 	head.HotKey = HotKey(hk)
 
 	// The rest should be 10 0x00 bytes.
-	binary.Read(sectionReader, binary.LittleEndian, &head.Reserved1)
-	binary.Read(sectionReader, binary.LittleEndian, &head.Reserved2)
-	binary.Read(sectionReader, binary.LittleEndian, &head.Reserved3)
+	_ = binary.Read(sectionReader, binary.LittleEndian, &head.Reserved1)
+	_ = binary.Read(sectionReader, binary.LittleEndian, &head.Reserved2)
+	_ = binary.Read(sectionReader, binary.LittleEndian, &head.Reserved3)
 
 	return head, err
-}
-
-// String prints the ShellLinkHeader in a table.
-func (h ShellLinkHeaderSection) String() string {
-	var sb, flags, attribs strings.Builder
-
-	// Append all flags.
-	for fl := range h.LinkFlags {
-		flags.WriteString(fl)
-		flags.WriteString("\n")
-	}
-
-	// Append all file attributes.
-	for at := range h.FileAttributes {
-		attribs.WriteString(at)
-		attribs.WriteString("\n")
-	}
-
-	table := tablewriter.NewWriter(&sb)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetRowLine(true)
-
-	table.SetHeader([]string{"ShellLinkHeader", "Value"})
-
-	table.Append([]string{"Magic", uint32TableStr(h.Magic)})
-	table.Append([]string{"LinkCLSID", hex.EncodeToString(h.LinkCLSID[:])})
-	table.Append([]string{"LinkFlags", flags.String()})
-	table.Append([]string{"FileAttributes", attribs.String()})
-	table.Append([]string{"CreationTime", h.CreationTime.String()})
-	table.Append([]string{"AccessTime", h.AccessTime.String()})
-	table.Append([]string{"WriteTime", h.WriteTime.String()})
-	table.Append([]string{"TargetFileSize", uint32TableStr(h.TargetFileSize)})
-	table.Append([]string{"IconIndex", uint32TableStr(uint32(h.IconIndex))})
-	table.Append([]string{"HotKey", h.HotKey})
-	table.Render()
-
-	return sb.String()
 }
 
 // Dump returns the hex.Dump of section data.
