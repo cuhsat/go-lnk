@@ -48,7 +48,7 @@ func VolumeID(r io.Reader, maxSize uint64) (v VolID, err error) {
 	// Read the section.
 	sectionData, sectionReader, sectionSize, err := readSection(r, 4, maxSize)
 	if err != nil {
-		return v, fmt.Errorf("golnk.VolumeID: read VolumeID section - %s", err.Error())
+		return v, fmt.Errorf("lnk.VolumeID: read VolumeID section - %s", err.Error())
 	}
 	_ = sectionSize
 	// fmt.Printf("Read section volumeID. %d bytes.\n", sectionSize)
@@ -58,7 +58,7 @@ func VolumeID(r io.Reader, maxSize uint64) (v VolID, err error) {
 	var dt uint32
 	err = binary.Read(sectionReader, binary.LittleEndian, &dt)
 	if err != nil {
-		return v, fmt.Errorf("golnk.VolumeID: read VolumeID.DriveType - %s", err.Error())
+		return v, fmt.Errorf("lnk.VolumeID: read VolumeID.DriveType - %s", err.Error())
 	}
 	// Check if it's a valid DriveType.
 	if dt >= uint32(len(driveType)) {
@@ -74,7 +74,7 @@ func VolumeID(r io.Reader, maxSize uint64) (v VolID, err error) {
 	var sr [4]byte
 	err = binary.Read(sectionReader, binary.LittleEndian, &sr)
 	if err != nil {
-		return v, fmt.Errorf("golnk.VolumeID: read VolumeID.DriveSerialNumber - %s", err.Error())
+		return v, fmt.Errorf("lnk.VolumeID: read VolumeID.DriveSerialNumber - %s", err.Error())
 	}
 	v.DriveSerialNumber = "0x" + hex.EncodeToString(sr[:])
 
@@ -83,7 +83,7 @@ func VolumeID(r io.Reader, maxSize uint64) (v VolID, err error) {
 	// Read VolumeLabelOffset.
 	err = binary.Read(sectionReader, binary.LittleEndian, &v.VolumeLabelOffset)
 	if err != nil {
-		return v, fmt.Errorf("golnk.VolumeID: read VolumeID.VolumeLabelOffset - %s", err.Error())
+		return v, fmt.Errorf("lnk.VolumeID: read VolumeID.VolumeLabelOffset - %s", err.Error())
 	}
 	// fmt.Println("VolumeID.VolumeLabelOffset:", v.VolumeLabelOffset)
 

@@ -119,7 +119,7 @@ func CommonNetwork(r io.Reader, maxSize uint64) (c CommonNetworkRelativeLink, er
 	// Read the section.
 	sectionData, sectionReader, sectionSize, err := readSection(r, 4, maxSize)
 	if err != nil {
-		return c, fmt.Errorf("golnk.CommonNetwork: read CommonNetwork section - %s", err.Error())
+		return c, fmt.Errorf("lnk.CommonNetwork: read CommonNetwork section - %s", err.Error())
 	}
 	c.Size = uint32(sectionSize)
 
@@ -132,7 +132,7 @@ func CommonNetwork(r io.Reader, maxSize uint64) (c CommonNetworkRelativeLink, er
 	// Read CommonNetworkRelativeLinkFlags.
 	err = binary.Read(sectionReader, binary.LittleEndian, &c.CommonNetworkRelativeLinkFlags)
 	if err != nil {
-		return c, fmt.Errorf("golnk.CommonNetwork: read CommonNetworkRelativeLinkFlags - %s", err.Error())
+		return c, fmt.Errorf("lnk.CommonNetwork: read CommonNetworkRelativeLinkFlags - %s", err.Error())
 	}
 	// fmt.Println("CommonNetworkRelativeLinkFlags", c.CommonNetworkRelativeLinkFlags)
 
@@ -148,14 +148,14 @@ func CommonNetwork(r io.Reader, maxSize uint64) (c CommonNetworkRelativeLink, er
 	// Read NetNameOffset.
 	err = binary.Read(sectionReader, binary.LittleEndian, &c.NetNameOffset)
 	if err != nil {
-		return c, fmt.Errorf("golnk.CommonNetwork: read NetNameOffset - %s", err.Error())
+		return c, fmt.Errorf("lnk.CommonNetwork: read NetNameOffset - %s", err.Error())
 	}
 	// fmt.Println("NetNameOffset", c.NetNameOffset)
 
 	// Read DeviceNameOffset.
 	err = binary.Read(sectionReader, binary.LittleEndian, &c.DeviceNameOffset)
 	if err != nil {
-		return c, fmt.Errorf("golnk.CommonNetwork: read DeviceNameOffset - %s", err.Error())
+		return c, fmt.Errorf("lnk.CommonNetwork: read DeviceNameOffset - %s", err.Error())
 	}
 	// fmt.Println("DeviceNameOffset", c.DeviceNameOffset)
 
@@ -163,7 +163,7 @@ func CommonNetwork(r io.Reader, maxSize uint64) (c CommonNetworkRelativeLink, er
 	var nType uint32
 	err = binary.Read(sectionReader, binary.LittleEndian, &nType)
 	if err != nil {
-		return c, fmt.Errorf("golnk.CommonNetwork: read NetworkProviderType - %s", err.Error())
+		return c, fmt.Errorf("lnk.CommonNetwork: read NetworkProviderType - %s", err.Error())
 	}
 	// fmt.Println("nType", nType)
 	// fmt.Printf("%x\n", nType)
@@ -179,14 +179,14 @@ func CommonNetwork(r io.Reader, maxSize uint64) (c CommonNetworkRelativeLink, er
 		// Read NetNameOffsetUnicode.
 		err = binary.Read(sectionReader, binary.LittleEndian, &c.NetNameOffsetUnicode)
 		if err != nil {
-			return c, fmt.Errorf("golnk.CommonNetwork: read NetNameOffsetUnicode - %s", err.Error())
+			return c, fmt.Errorf("lnk.CommonNetwork: read NetNameOffsetUnicode - %s", err.Error())
 		}
 		// fmt.Println("NetNameOffsetUnicode", c.NetNameOffsetUnicode)
 
 		// Read DeviceNameOffsetUnicode.
 		err = binary.Read(sectionReader, binary.LittleEndian, &c.DeviceNameOffsetUnicode)
 		if err != nil {
-			return c, fmt.Errorf("golnk.CommonNetwork: read DeviceNameOffsetUnicode - %s", err.Error())
+			return c, fmt.Errorf("lnk.CommonNetwork: read DeviceNameOffsetUnicode - %s", err.Error())
 		}
 		// fmt.Println("DeviceNameOffsetUnicode", c.DeviceNameOffsetUnicode)
 	} else {

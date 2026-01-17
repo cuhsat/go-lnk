@@ -47,7 +47,7 @@ func readSection(r io.Reader, sSize int, maxSize uint64) (data []byte, nr io.Rea
 		var size16 uint16
 		err = binary.Read(r, binary.LittleEndian, &size16)
 		if err != nil {
-			return data, nr, size, fmt.Errorf("golnk.readSection: read size %d bytes - %s", sSize, err.Error())
+			return data, nr, size, fmt.Errorf("lnk.readSection: read size %d bytes - %s", sSize, err.Error())
 		}
 		sectionSize = uint64(size16)
 		// Add bytes to the start of data []byte.
@@ -57,7 +57,7 @@ func readSection(r io.Reader, sSize int, maxSize uint64) (data []byte, nr io.Rea
 		var size32 uint32
 		err = binary.Read(r, binary.LittleEndian, &size32)
 		if err != nil {
-			return data, nr, size, fmt.Errorf("golnk.readSection: read size %d bytes - %s", sSize, err.Error())
+			return data, nr, size, fmt.Errorf("lnk.readSection: read size %d bytes - %s", sSize, err.Error())
 		}
 		sectionSize = uint64(size32)
 		// Add bytes to the start of data []byte.
@@ -66,24 +66,24 @@ func readSection(r io.Reader, sSize int, maxSize uint64) (data []byte, nr io.Rea
 		// Read uint64 or sectionSize.
 		err = binary.Read(r, binary.LittleEndian, &sectionSize)
 		if err != nil {
-			return data, nr, size, fmt.Errorf("golnk.readSection: read size %d bytes - %s", sSize, err.Error())
+			return data, nr, size, fmt.Errorf("lnk.readSection: read size %d bytes - %s", sSize, err.Error())
 		}
 		// Add bytes to the start of data []byte.
 		data = uint64Byte(sectionSize)
 	default:
-		return data, nr, size, fmt.Errorf("golnk.readSection: invalid sSize - got %v", sSize)
+		return data, nr, size, fmt.Errorf("lnk.readSection: invalid sSize - got %v", sSize)
 	}
 
 	// Create a []byte of sectionSize-4 and read that many bytes from io.Reader.
 	computedSize := sectionSize - uint64(sSize)
 	if computedSize > maxSize {
-		return data, nr, size, fmt.Errorf("golnk.readSection: invalid computed size got %d; expected a size < %d", computedSize, maxSize)
+		return data, nr, size, fmt.Errorf("lnk.readSection: invalid computed size got %d; expected a size < %d", computedSize, maxSize)
 	}
 
 	tempData := make([]byte, computedSize)
 	err = binary.Read(r, binary.LittleEndian, &tempData)
 	if err != nil {
-		return data, nr, size, fmt.Errorf("golnk.readSection: read section %d bytes - %s", sectionSize-uint64(sSize), err.Error())
+		return data, nr, size, fmt.Errorf("lnk.readSection: read section %d bytes - %s", sectionSize-uint64(sSize), err.Error())
 	}
 
 	// If this is successful, append it to data []byte.
@@ -131,14 +131,14 @@ func readStringData(r io.Reader, isUnicode bool) (str string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			// If panic occurs, return this error message
-			err = fmt.Errorf("golnk.readStringData: not enough bytes in reader")
+			err = fmt.Errorf("lnk.readStringData: not enough bytes in reader")
 		}
 	}()
 
 	var size uint16
 	err = binary.Read(r, binary.LittleEndian, &size)
 	if err != nil {
-		return str, fmt.Errorf("golnk.readStringData: read size - %s", err.Error())
+		return str, fmt.Errorf("lnk.readStringData: read size - %s", err.Error())
 	}
 	if isUnicode {
 		size = size * 2
@@ -146,7 +146,7 @@ func readStringData(r io.Reader, isUnicode bool) (str string, err error) {
 	b := make([]byte, size)
 	err = binary.Read(r, binary.LittleEndian, &b)
 	if err != nil {
-		return str, fmt.Errorf("golnk.readStringData: read bytes - %s", err.Error())
+		return str, fmt.Errorf("lnk.readStringData: read bytes - %s", err.Error())
 	}
 	// If Unicode, read every 2 byte and get a rune.
 	if isUnicode {

@@ -42,7 +42,7 @@ func DataBlock(r io.Reader) (extra ExtraDataSection, err error) {
 		var size uint32
 		err = binary.Read(r, binary.LittleEndian, &size)
 		if err != nil {
-			return extra, fmt.Errorf("golnk.readDataBlock: read size - %s", err.Error())
+			return extra, fmt.Errorf("lnk.readDataBlock: read size - %s", err.Error())
 		}
 		// fmt.Println("Size", size)
 		// Have we reached the TerminalBlock?
@@ -55,7 +55,7 @@ func DataBlock(r io.Reader) (extra ExtraDataSection, err error) {
 		// Read block's signature.
 		err = binary.Read(r, binary.LittleEndian, &db.Signature)
 		if err != nil {
-			return extra, fmt.Errorf("golnk.readDataBlock: read signature - %s", err.Error())
+			return extra, fmt.Errorf("lnk.readDataBlock: read signature - %s", err.Error())
 		}
 		// fmt.Println("Signature", hex.EncodeToString(uint32Byte(db.Signature)))
 		db.Type = blockSignature(db.Signature)
@@ -65,7 +65,7 @@ func DataBlock(r io.Reader) (extra ExtraDataSection, err error) {
 		data := make([]byte, db.Size-8)
 		err = binary.Read(r, binary.LittleEndian, &data)
 		if err != nil {
-			return extra, fmt.Errorf("golnk.readDataBlock: read data - %s", err.Error())
+			return extra, fmt.Errorf("lnk.readDataBlock: read data - %s", err.Error())
 		}
 		db.Data = data
 		// fmt.Println(hex.Dump(data))

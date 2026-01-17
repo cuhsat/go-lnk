@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	lnk "github.com/cuhsat/golnk"
+	lnk "github.com/cuhsat/go-lnk"
 )
 
 func main() {

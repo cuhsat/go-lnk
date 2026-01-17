@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/cuhsat/golnk"
+	"github.com/cuhsat/go-lnk"
 )
 
 func main() {

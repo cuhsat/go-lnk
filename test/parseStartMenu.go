@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cuhsat/golnk"
+	"github.com/cuhsat/go-lnk"
 )
 
 // Sample program to parse all lnk files in the "All Users" start menu at
